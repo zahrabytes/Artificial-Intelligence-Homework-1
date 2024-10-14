@@ -21,11 +21,11 @@ def printPaths(find_these, distances, prev):
         path_str = ' -> '.join(map(str, path))
         print(f"To vertex {vertex}: {path_str:<30} Weight: {distances[vertex]:<6}")
 
-def dijkstras(graph): # for BFS
+def dijkstras(graph): #for BFS weighted
     Q = deque(graph.keys()) #vertices to visit
     distances = {vertex: math.inf for vertex in graph} #distances from origin
     distances[0] = 0
-    prev = {vertex: None for vertex in graph} # previously visited with vertex visited 
+    prev = {vertex: None for vertex in graph} #previously visited with vertex visited 
 
     #visit one vertex
 
@@ -42,25 +42,39 @@ def dijkstras(graph): # for BFS
                 prev[neighbor] = min_vertex
     return prev, distances
 
-def depth_first_shortest_path(graph, start, targets):
-    def dfs(vertex, path, weight):
-        if weight >= distances[vertex]:
-            return  # Prune if we've found a shorter path already
+def dfs_weighted(graph, start, targets, path=None, visited=None, current_weight=0):
+    if path is None:
+        path = []
+    if visited is None:
+        visited = set()
 
-        distances[vertex] = weight
-        prev[vertex] = path[-2] if len(path) > 1 else None
+    path.append(start)
+    visited.add(start)
+    
+    if start in targets:
+        return path, current_weight
 
-        if vertex in targets and all(distances[t] != math.inf for t in targets):
-            return  # Early termination if all targets are found
+    for neighbor, weight in graph[start]:
+        if neighbor not in visited:
+            result = dfs_weighted(graph, neighbor, targets, path.copy(), visited.copy(), current_weight + weight)
+            if result:
+                return result
 
-        for neighbor, edge_weight in graph[vertex]:
-            dfs(neighbor, path + [neighbor], weight + edge_weight)
+    return None
 
+def find_paths(graph, start, targets):
     distances = {vertex: math.inf for vertex in graph}
     prev = {vertex: None for vertex in graph}
-    
-    dfs(start, [start], 0)
-    
+
+    for target in targets:
+        result = dfs_weighted(graph, start, {target})
+        if result:
+            path, weight = result
+            if weight < distances[target]:
+                distances[target] = weight
+                for i in range(len(path) - 1):
+                    prev[path[i+1]] = path[i]
+
     return prev, distances
 
 graph = {
@@ -75,7 +89,7 @@ graph = {
 max_vertex = max(graph.keys())
 find_these = [5, 6, 7]
 Dijkstras_prev, Dijkstras_distances = dijkstras(graph)
-DFS_prev, DFS_distances = depth_first_shortest_path(graph, 0, find_these)
+DFS_prev, DFS_distances = find_paths(graph, 0, find_these)
 print("Shortest paths and weights:")
 print("BFS")
 printPaths(find_these, Dijkstras_distances, Dijkstras_prev)
