@@ -108,3 +108,45 @@ print("path (light edition):", path_decreased)
 # with the mixed version (very diverse!)
 path_mixed = a_star(graph_mixed, start, goal)
 print("path (diverse edition):", path_mixed)
+
+def path_cost(graph, path):
+    return sum(next(cost for node, cost in graph[path[i]] if node == path[i+1]) for i in range(len(path)-1))
+
+# Define scenarios
+scenarios = {
+    "Normal Traffic": graph,
+    "Heavy Traffic": graph_increased,
+    "Light Traffic": graph_decreased,
+    "Mixed Traffic": graph_mixed
+}
+
+results = {}
+
+for scenario, g in scenarios.items():
+    path = a_star(g, start, goal)
+    travel_time = path_cost(g, path)
+    results[scenario] = {"path": path, "travel_time": travel_time}
+
+# Print results
+print("Optimal Paths and Travel Times:")
+print("---------------------------------")
+for scenario, data in results.items():
+    print(f"{scenario}:")
+    print(f"  Path: {' -> '.join(map(str, data['path']))}")
+    print(f"  Travel Time: {data['travel_time']} units")
+    print()
+
+# Visualize the paths
+def visualize_paths(results):
+    for scenario, data in results.items():
+        path = data['path']
+        print(f"\n{scenario} Path:")
+        for y in range(4):  # Extended to 4 to include the goal at (2,3)
+            for x in range(3):
+                if (x, y) in path:
+                    print("O", end=" ")
+                else:
+                    print(".", end=" ")
+            print()
+
+visualize_paths(results)
