@@ -112,7 +112,6 @@ print("path (diverse edition):", path_mixed)
 def path_cost(graph, path):
     return sum(next(cost for node, cost in graph[path[i]] if node == path[i+1]) for i in range(len(path)-1))
 
-# Define scenarios
 scenarios = {
     "Normal Traffic": graph,
     "Heavy Traffic": graph_increased,
@@ -127,7 +126,6 @@ for scenario, g in scenarios.items():
     travel_time = path_cost(g, path)
     results[scenario] = {"path": path, "travel_time": travel_time}
 
-# Print results
 print("Optimal Paths and Travel Times:")
 print("---------------------------------")
 for scenario, data in results.items():
@@ -136,7 +134,7 @@ for scenario, data in results.items():
     print(f"  Travel Time: {data['travel_time']} units")
     print()
 
-# Visualize the paths
+# Visualize the paths (Claude AI helped me with this part)
 def visualize_paths(results):
     for scenario, data in results.items():
         path = data['path']
